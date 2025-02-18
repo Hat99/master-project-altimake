@@ -71,7 +71,7 @@ public class OptionsHandler : MonoBehaviour
             OnToggleValueChanged(part, toggle);
         });
 
-        optionObject.GetComponentInChildren<Button>().onClick.AddListener(delegate
+        optionObject.GetComponentInChildren<Button>()?.onClick.AddListener(delegate
         {
             OnEditOptionClicked(part);
         });
