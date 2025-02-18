@@ -71,6 +71,11 @@ public class OptionsHandler : MonoBehaviour
             OnToggleValueChanged(part, toggle);
         });
 
+        optionObject.GetComponentInChildren<Button>().onClick.AddListener(delegate
+        {
+            OnEditOptionClicked(part);
+        });
+
         optionObject.SetActive(true);
     }
 
@@ -110,8 +115,10 @@ public class OptionsHandler : MonoBehaviour
 
     public void RemoveOption(Altimate.Part part)
     {
+        int count = 0;
         foreach(Transform child in optionHolder.transform)
         {
+            Debug.Log(++count);
             if(child.gameObject.GetComponentInChildren<TextMeshProUGUI>().text == part.displayName)
             {
                 Destroy(child.gameObject);
@@ -126,12 +133,73 @@ public class OptionsHandler : MonoBehaviour
     public GameObject layerContainer;
     public GameObject layerTemplate;
     public Toggle onByDefaultToggle;
-    public void OnAddOptionClicked()
+    public TextMeshProUGUI addOptionsHeader;
+    public Button addButton;
+    public Button deleteButton;
+    public Button saveButton;
+
+    public void PrepareOptionsMenuForAdd()
     {
         optionNameInput.text = "";
         ClearLayerContainer();
         dropLayersHereText.gameObject.SetActive(true);
         onByDefaultToggle.isOn = true;
+        addOptionsHeader.text = "Add Toggle Option";
+        addButton.gameObject.SetActive(true);
+        deleteButton.gameObject.SetActive(false);
+        saveButton.gameObject.SetActive(false);
+    }
+
+    public void PrepareOptionsMenuForEdit(Altimate.Part part)
+    {
+        optionNameInput.text = part.displayName;
+        ClearLayerContainer();
+
+        foreach(Altimate.Part.ImageData image in part.images)
+        {
+            LoadLayerObject(image);
+        }
+
+        dropLayersHereText.gameObject.SetActive(part.images.Count == 0);
+        onByDefaultToggle.isOn = part.onByDefault;
+
+        addOptionsHeader.text = "Edit Toggle Option";
+        addButton.gameObject.SetActive(false);
+        deleteButton.gameObject.SetActive(true);
+
+        deleteButton.onClick.RemoveAllListeners();
+        deleteButton.onClick.AddListener(delegate
+        {
+            OnDeleteToggleClicked(part);
+        });
+
+        saveButton.gameObject.SetActive(true);
+        saveButton.onClick.RemoveAllListeners();
+        saveButton.onClick.AddListener(delegate
+        {
+            OnSaveToggleClicked(part);
+        });
+    }
+
+    public void LoadLayerObject(Altimate.Part.ImageData image)
+    {
+        GameObject layer = Instantiate(layerTemplate, layerContainer.transform);
+        layer.GetComponentInChildren<TextMeshProUGUI>().text = image.source;
+
+        //TODO: delete layer button assignment
+
+        layer.SetActive(true);
+    }
+
+    public void OnAddOptionClicked()
+    {
+        PrepareOptionsMenuForAdd();
+        addOptionMenu.SetActive(true);
+    }
+
+    public void OnEditOptionClicked(Altimate.Part part)
+    {
+        PrepareOptionsMenuForEdit(part);
         addOptionMenu.SetActive(true);
     }
 
@@ -155,9 +223,7 @@ public class OptionsHandler : MonoBehaviour
         if(flag != null && flag.flag == "layer target")
         {
             dropLayersHereText.gameObject.SetActive(false);
-            GameObject layer = Instantiate(layerTemplate, layerContainer.transform);
-            layer.GetComponentInChildren<TextMeshProUGUI>().text = imageData.source;
-            layer.SetActive(true);
+            LoadLayerObject(imageData);
         }
     }
 
@@ -188,6 +254,56 @@ public class OptionsHandler : MonoBehaviour
         
         AltimateHelper.altimate.parts.Add(part);
         LoadToggleOption(part);
+
+        addOptionMenu.SetActive(false);
+    }
+
+    public void OnSaveToggleClicked(Altimate.Part part)
+    {
+        //remove old option
+        RemoveOption(part);
+
+        part.displayName = optionNameInput.text;
+        part.onByDefault = onByDefaultToggle.isOn;
+
+        foreach (Transform child in layerContainer.transform)
+        {
+            string imageSource = child.GetComponentInChildren<TextMeshProUGUI>().text;
+
+            foreach (Altimate.Part.ImageData image in AltimateHelper.images)
+            {
+                if (imageSource == image.source)
+                {
+                    //remove image from basePart
+                    AltimateHelper.altimate.parts[0].images.Remove(image);
+                    //add image to new part if it's not added yet
+                    if (!part.images.Contains(image))
+                    {
+                        part.images.Add(image);
+                    }
+                    break;
+                }
+            }
+
+        }
+
+        LoadToggleOption(part);
+
+        addOptionMenu.SetActive(false);
+    }
+
+    public void OnDeleteToggleClicked(Altimate.Part part)
+    {
+        foreach(Altimate.Part.ImageData image in part.images)
+        {
+            if (!AltimateHelper.altimate.parts[0].images.Contains(image))
+            {
+                AltimateHelper.altimate.parts[0].images.Add(image);
+            }
+        }
+
+        AltimateHelper.altimate.parts.Remove(part);
+        RemoveOption(part);
 
         addOptionMenu.SetActive(false);
     }
