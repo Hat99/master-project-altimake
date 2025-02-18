@@ -4,6 +4,7 @@ using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class LayerHandler : MonoBehaviour
 {
@@ -80,6 +81,11 @@ public class LayerHandler : MonoBehaviour
             OnLayerValueEditEnd(image, inputField);
         });
 
+        layerObject.GetComponentInChildren<Button>().onClick.AddListener(delegate
+        {
+            OnRemoveLayerClicked(layerObject, image);
+        });
+
         DragDrop dragDrop = layerObject.GetComponent<DragDrop>();
         dragDrop.onDragEnd.AddListener((PointerEventData eventData) =>
         {
@@ -87,5 +93,11 @@ public class LayerHandler : MonoBehaviour
         });
 
         layerObject.SetActive(true);
+    }
+
+    public void OnRemoveLayerClicked(GameObject layerObject, Altimate.Part.ImageData image)
+    {
+        Destroy(layerObject);
+        AltimateHelper.RemoveImage(image);
     }
 }

@@ -125,4 +125,64 @@ public static class AltimateHelper
         //write new file
         SaveAltimate();
     }
+
+    public static void RemoveImage(Altimate.Part.ImageData image)
+    {
+        //Remove image from global list
+        images.Remove(image);
+        //Remove image from rendering
+        ImageHandler.instance.RemoveImage(image);
+
+        //remove image references from altimate
+        //also removes any parts that are now useless
+        List<Altimate.Part> emptyParts = new List<Altimate.Part>();
+        foreach(Altimate.Part part in altimate.parts)
+        {
+            foreach(Altimate.Part.ImageData imageData in part.images)
+            {
+                if(imageData.source == image.source)
+                {
+                    part.images.Remove(imageData);
+                    if(part.images.Count == 0)
+                    {
+                        emptyParts.Add(part);
+                    }
+                    break;
+                }
+            }
+            List<Altimate.Part> emptySubParts = new List<Altimate.Part>();
+            foreach (Altimate.Part subPart in part.subParts)
+            {
+                foreach (Altimate.Part.ImageData imageData in part.images)
+                {
+                    if (imageData.source == image.source)
+                    {
+                        part.images.Remove(imageData);
+                        if (subPart.images.Count == 0)
+                        {
+                            emptySubParts.Add(subPart);
+                        }
+                        break;
+                    }
+                }
+                
+            }
+            foreach(Altimate.Part subPart in emptySubParts)
+            {
+                part.subParts.Remove(subPart);
+                //TODO: remove drop down options from relevant part
+            }
+        }
+        foreach(Altimate.Part part in emptyParts)
+        {
+            //remove part if it's not the basePart
+            if(altimate.parts.IndexOf(part) != 0)
+            {
+                altimate.parts.Remove(part);
+                OptionsHandler.instance.RemoveOption(part);
+            }
+        }
+
+        
+    }
 }

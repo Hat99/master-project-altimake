@@ -61,8 +61,7 @@ public class OptionsHandler : MonoBehaviour
     {
         //instantiate object
         GameObject optionObject = Instantiate(optionToggleTemplate, optionHolder.transform);
-        optionObject.GetComponentInChildren<TMP_InputField>().text = part.displayName;
-        //TODO: inputfield changed -> ?
+        optionObject.GetComponentInChildren<TextMeshProUGUI>().text = part.displayName;
 
         Toggle toggle = optionObject.GetComponent<Toggle>();
         toggle.isOn = part.onByDefault;
@@ -107,6 +106,18 @@ public class OptionsHandler : MonoBehaviour
         });
 
         optionObject.SetActive(true);
+    }
+
+    public void RemoveOption(Altimate.Part part)
+    {
+        foreach(Transform child in optionHolder.transform)
+        {
+            if(child.gameObject.GetComponentInChildren<TextMeshProUGUI>().text == part.displayName)
+            {
+                Destroy(child.gameObject);
+                break;
+            }
+        }
     }
 
     public GameObject addOptionMenu;

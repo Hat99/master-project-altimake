@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using UnityEngine.Networking;
 using UnityEditor;
 using Unity.VisualScripting;
+using static Altimate.Part;
+using System;
 
 public class ImageHandler : MonoBehaviour
 {
@@ -81,6 +83,17 @@ public class ImageHandler : MonoBehaviour
                     index--;
                     break;
                 }
+            }
+        }
+    }
+
+    public void RemoveImage(Altimate.Part.ImageData image)
+    {
+        foreach(Transform child in imageHolder.transform)
+        {
+            if (child.gameObject.name == image.source)
+            {
+                Destroy(child.gameObject);
             }
         }
     }
