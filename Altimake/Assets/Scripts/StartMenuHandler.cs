@@ -11,6 +11,12 @@ public class StartMenuHandler : MonoBehaviour
 
     public TMP_InputField altimateNameText;
 
+    public static StartMenuHandler instance;
+    private void Start()
+    {
+        instance = this;
+    }
+
     public void OnNewFileClicked()
     {
         //select save location for autosaves
