@@ -2,9 +2,9 @@ using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Forms;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainMenuHandler : MonoBehaviour
 {
@@ -12,6 +12,35 @@ public class MainMenuHandler : MonoBehaviour
     public GameObject fileViewItemTemplate;
 
     public TMP_InputField altimateTitle;
+
+    public static MainMenuHandler instance;
+
+    private void Start()
+    {
+        instance = this;
+    }
+
+    //resets the entire system to allow for loading a different file
+    public void ClearAll()
+    {
+        ClearComponents();
+        AltimateHelper.Clear();
+        TimedThread.UseTime(false);
+    }
+
+    public void ClearComponents()
+    {
+        ImageHandler.instance.Clear();
+        OptionsHandler.instance.Clear();
+        LayerHandler.instance.Clear();
+    }
+    public void ReloadAltimate()
+    {
+        ClearComponents();
+
+        AltimateHelper.LoadAltimate(AltimateHelper.altimate.name + ".json");
+    }
+
 
 
     public void OnSaveClicked()
@@ -53,10 +82,24 @@ public class MainMenuHandler : MonoBehaviour
                 string name = Path.GetFileName(file);
                 GameObject item = Instantiate(fileViewItemTemplate, fileViewContent.transform);
 
-                item.GetComponentInChildren<UnityEngine.UI.Button>().onClick.AddListener(delegate
+                
+                foreach(Button button in item.GetComponentsInChildren<Button>())
                 {
-                    OnAddImportedFileClicked(name);
-                });
+                    if(button.gameObject.name == "add")
+                    {
+                        button.onClick.AddListener(delegate
+                        {
+                            OnAddImportedFileClicked(name);
+                        });
+                    }
+                    else if(button.gameObject.name == "delete")
+                    {
+                        button.onClick.AddListener(delegate
+                        {
+                            OnDeleteImportedFileClicked(name);
+                        });
+                    }
+                }
 
                 item.GetComponentInChildren<TextMeshProUGUI>().text = name;
 
@@ -104,8 +147,28 @@ public class MainMenuHandler : MonoBehaviour
         LayerHandler.instance.RefreshLayers();
     }
 
-    public void OnDeleteImportedFileClicked()
+    public void OnDeleteImportedFileClicked(string fileName)
     {
-        //TODO: delete file and all references?
+        foreach(Altimate.Part.ImageData image in AltimateHelper.images)
+        {
+            if(image.source == fileName)
+            {
+                AltimateHelper.images.Remove(image);
+                ImageHandler.instance.RemoveImage(image);
+                foreach(Altimate.Part part in AltimateHelper.altimate.parts)
+                {
+                    part.images.Remove(image);
+                    foreach(Altimate.Part subPart in part.subParts)
+                    {
+                        subPart.images.Remove(image);
+                    }
+                }
+                break;
+            }
+        }
+        File.Delete(AltimateHelper.basePath + Path.DirectorySeparatorChar + fileName);
+
+        RefreshFileView();
+        ReloadAltimate();
     }
 }

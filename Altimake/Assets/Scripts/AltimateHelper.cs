@@ -24,6 +24,14 @@ public static class AltimateHelper
     public static string basePath;
 
 
+    public static void Clear()
+    {
+        altimate = null;
+        images.Clear();
+        maxLayer = 0f;
+        basePath = "";
+    }
+
     //creates an empty altimate and saves it in basePath
     public static void CreateNewAltimate()
     {

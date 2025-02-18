@@ -21,7 +21,9 @@ public class StartMenuHandler : MonoBehaviour
             //TODO: pop up "Please choose a folder"
             return;
         }
-        Debug.Log(path);
+
+        //clear anything currently present in the program
+        MainMenuHandler.instance.ClearAll();
 
         AltimateHelper.basePath = path;
         AltimateHelper.CreateNewAltimate();
@@ -38,6 +40,9 @@ public class StartMenuHandler : MonoBehaviour
             //TODO: pop up "Please choose a folder"
             return;
         }
+
+        //clear anything currently present in the program
+        MainMenuHandler.instance.ClearAll();
 
         //isolate file name from basePath
         string [] split = path.Split(Path.DirectorySeparatorChar);
