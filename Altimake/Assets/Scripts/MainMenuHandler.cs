@@ -23,6 +23,11 @@ public class MainMenuHandler : MonoBehaviour
     {
         string[] paths = FileHelper.PickMultipleFilesPath("Please select the image(s) you want to import:");
 
+        if(paths == null)
+        {
+            return;
+        }
+
         foreach (string path in paths)
         {
             string fileName = Path.GetFileName(path);
