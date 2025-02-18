@@ -181,10 +181,20 @@ public class OptionsHandler : MonoBehaviour
         });
     }
 
+    public void OnLayerDeleteClicked(GameObject layerObject, Altimate.Part.ImageData image)
+    {
+        Destroy(layerObject);
+    }
+
     public void LoadLayerObject(Altimate.Part.ImageData image)
     {
         GameObject layer = Instantiate(layerTemplate, layerContainer.transform);
         layer.GetComponentInChildren<TextMeshProUGUI>().text = image.source;
+
+        layer.GetComponentInChildren<Button>().onClick.AddListener(delegate
+        {
+            OnLayerDeleteClicked(layer, image);
+        });
 
         //TODO: delete layer button assignment
 
@@ -266,6 +276,15 @@ public class OptionsHandler : MonoBehaviour
         part.displayName = optionNameInput.text;
         part.onByDefault = onByDefaultToggle.isOn;
 
+        foreach(Altimate.Part.ImageData image in part.images)
+        {
+            if (!AltimateHelper.altimate.parts[0].images.Contains(image))
+            {
+                AltimateHelper.altimate.parts[0].images.Add(image);
+            }
+        }
+        part.images.Clear();
+
         foreach (Transform child in layerContainer.transform)
         {
             string imageSource = child.GetComponentInChildren<TextMeshProUGUI>().text;
@@ -276,11 +295,8 @@ public class OptionsHandler : MonoBehaviour
                 {
                     //remove image from basePart
                     AltimateHelper.altimate.parts[0].images.Remove(image);
-                    //add image to new part if it's not added yet
-                    if (!part.images.Contains(image))
-                    {
-                        part.images.Add(image);
-                    }
+                    //add image to new part
+                    part.images.Add(image);
                     break;
                 }
             }
