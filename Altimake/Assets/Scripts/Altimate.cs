@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 
 
-/**********************/
-/*altimate data object*/
-/**********************/
+
+/************************/
+/* altimate data object */
+/************************/
+
 [Serializable]
 public class Altimate
 {

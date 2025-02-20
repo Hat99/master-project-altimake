@@ -2,28 +2,39 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
-using System.Threading.Tasks;
-using UnityEngine.Networking;
-using UnityEditor;
-using Unity.VisualScripting;
-using static Altimate.Part;
-using System;
+
+
+
+/**********************************************/
+/* handles images and rendering functionality */
+/**********************************************/
 
 public class ImageHandler : MonoBehaviour
 {
-    /****************************/
-    /*helper for handling images*/
-    /****************************/
+    #region fields
 
     public GameObject imageHolder;
     public GameObject imageTemplate;
 
-    public static ImageHandler instance;
+    public Slider zoomSlider;
 
+    //how fast mouse wheel zoom zooms in and out (factor)
+    public float zoomSpeed;
+
+    private bool inZoomSpace;
+
+    //allows calling from other classes
+    public static ImageHandler instance;
     private void Start()
     {
         instance = this;
     }
+
+    #endregion fields
+
+
+
+    #region rendering
 
     public void Clear()
     {
@@ -48,9 +59,11 @@ public class ImageHandler : MonoBehaviour
         image.GetComponent<AspectRatioFitter>().aspectRatio = (float)loadTexture.width / (float)loadTexture.height;
         image.SetActive(imageData.isActive);
 
+        //signal the timed thread to start loading the next image if there is one
         TimedThread.instance.imageLoaded = true;
     }
 
+    //toggle image visibility for given image data list
     public void UpdateImage(List<Altimate.Part.ImageData> images)
     {
         int i = images.Count;
@@ -79,6 +92,7 @@ public class ImageHandler : MonoBehaviour
             {
                 if(child.gameObject.name == imageData.source)
                 {
+                    //sibling index equals order in object hierarchy and thus "layer" order
                     child.SetSiblingIndex(index);
                     index--;
                     break;
@@ -98,21 +112,24 @@ public class ImageHandler : MonoBehaviour
         }
     }
 
+    #endregion rendering
+
+
+
+    #region image zoom
+
     public void SetImageZoom(float zoom)
     {
         imageHolder.transform.localScale = new Vector3(zoom, zoom, zoom);
     }
-
-    public Slider zoomSlider;
+    
     public void ResetImageZoomAndPos()
     {
         zoomSlider.value = 1;
         imageHolder.transform.localScale = Vector3.one;
         imageHolder.transform.localPosition = new Vector3(0,60,0);
     }
-
-    public float zoomSpeed;
-    private bool inZoomSpace;
+    
     private void Update()
     {
         if (inZoomSpace)
@@ -121,6 +138,7 @@ public class ImageHandler : MonoBehaviour
         }
     }
 
+    //only allow for zoom if the mouse is in the designated area
     public void OnMouseEnterZoomSpace()
     {
         inZoomSpace = true;
@@ -129,4 +147,6 @@ public class ImageHandler : MonoBehaviour
     {
         inZoomSpace = false;
     }
+
+    #endregion image zoom
 }

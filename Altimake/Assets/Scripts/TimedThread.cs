@@ -1,27 +1,36 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
 
 
 /************************************/
 /*"thread" for handling timed events*/
 /************************************/
+
 public class TimedThread : MonoBehaviour
 {
-    [Tooltip("Interval in seconds for auto save feature")]
+    #region fields
+
+    //interval for auto saving
     public float autoSaveInterval = 60f;
     private float autoSaveTimer;
 
+    //interval for refreshing the file view
     public float refreshFileView = 1f;
     private float refreshFileViewTimer;
-    private MainMenuHandler mainMenuHandler;
 
     public bool imageLoaded;
     private int imageLoadingIndex;
     private bool loadingImages;
 
+    //allows calling from other classes
     public static TimedThread instance;
-    // Start is called before the first frame update
+
+    #endregion fields
+
+
+
+    #region methods
+
     void Start()
     {
         instance = this;
@@ -32,9 +41,9 @@ public class TimedThread : MonoBehaviour
         //initiate auto save timer
         autoSaveTimer = autoSaveInterval;
 
-        //initiate file view refresh timer (close to 0 to see files asap)
+        //initiate file view refresh timer
+        //(close to 0 to see files asap but not 0 because updates are still called)
         refreshFileViewTimer = 0.1f;
-        mainMenuHandler = GetComponent<MainMenuHandler>();
     }
 
     // Update is called once per frame
@@ -53,10 +62,12 @@ public class TimedThread : MonoBehaviour
         refreshFileViewTimer -= Time.deltaTime;
         if (refreshFileViewTimer < 0)
         {
-            mainMenuHandler.RefreshFileView();
+            MainMenuHandler.instance.RefreshFileView();
             refreshFileViewTimer = refreshFileView;
         }
 
+        //load images one by one to not freeze the main thread too long at a time
+        //TODO: show loading progress and prohibit inputs until loading has finished
         if (loadingImages && imageLoaded)
         {
             imageLoaded = false;
@@ -96,4 +107,6 @@ public class TimedThread : MonoBehaviour
             ImageHandler.instance.LoadImage(AltimateHelper.images[imageLoadingIndex]);
         }
     }
+
+    #endregion methods
 }

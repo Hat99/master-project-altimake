@@ -1,27 +1,54 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using AnotherFileBrowser.Windows;
 using UnityEngine.EventSystems;
+
+
+
+/***********************************************/
+/* handles use, display and editing of options */
+/***********************************************/
 
 public class OptionsHandler : MonoBehaviour
 {
-    public GameObject optionHolder;
-    public GameObject optionToggleTemplate;
+    #region fields
 
+    //scroll container for loaded options
+    public GameObject optionHolder;
+
+    //templates for options 
+    public GameObject optionToggleTemplate;
     public GameObject optionDropdownTemplate;
 
-    public static OptionsHandler instance;
+    //add / edit options menu references
+    public GameObject addOptionMenu;
+    public TMP_InputField optionNameInput;
+    public TextMeshProUGUI dropLayersHereText;
+    public GameObject layerContainer;
+    public GameObject layerTemplate;
+    public Toggle onByDefaultToggle;
+    public TextMeshProUGUI addOptionsHeader;
+    public Button addButton;
+    public Button deleteButton;
+    public Button saveButton;
 
+    //allows calling from other classes
+    public static OptionsHandler instance;
     private void Start()
     {
         instance = this;
     }
 
+    #endregion fields
+
+
+
+    #region option values changed
+
     public void OnToggleValueChanged(Altimate.Part part, Toggle toggle)
     {
+        //when a toggle option is changed, all relevant images must be updated
         SetImagesActive(part.images, toggle.isOn);
     }
 
@@ -36,18 +63,26 @@ public class OptionsHandler : MonoBehaviour
         }
     }
 
+    //sets active status of a list of images and updates rendering accordingly
     private void SetImagesActive(List<Altimate.Part.ImageData> images, bool val)
     {
-        //set values
+        //set value for all given images
         foreach(Altimate.Part.ImageData image in images)
         {
             image.isActive = val;
         }
 
-        //update rendering
+        //update rendering of given images
         ImageHandler.instance.UpdateImage(images);
     }
 
+    #endregion option values changed
+
+
+
+    #region option loading
+
+    //clear the option scroll view
     public void Clear()
     {
         foreach (Transform child in optionHolder.transform)
@@ -61,24 +96,27 @@ public class OptionsHandler : MonoBehaviour
     {
         //instantiate object
         GameObject optionObject = Instantiate(optionToggleTemplate, optionHolder.transform);
-        optionObject.GetComponentInChildren<TextMeshProUGUI>().text = part.displayName;
 
+        //set option starting values
+        optionObject.GetComponentInChildren<TextMeshProUGUI>().text = part.displayName;
         Toggle toggle = optionObject.GetComponent<Toggle>();
         toggle.isOn = part.onByDefault;
 
+        //assign listeners to new object
         toggle.onValueChanged.AddListener(delegate
         {
             OnToggleValueChanged(part, toggle);
         });
-
         optionObject.GetComponentInChildren<Button>()?.onClick.AddListener(delegate
         {
             OnEditOptionClicked(part);
         });
 
+        //set object visible
         optionObject.SetActive(true);
     }
 
+    //not used, under construction!
     public void LoadDropDownOption(Altimate.Part part)
     {
         //TODO
@@ -113,12 +151,13 @@ public class OptionsHandler : MonoBehaviour
         optionObject.SetActive(true);
     }
 
+    //removes an option from the generated list
+    //note: options are identified by their name which only works for unique names
+    //-> TODO: find better way of identification
     public void RemoveOption(Altimate.Part part)
     {
-        int count = 0;
         foreach(Transform child in optionHolder.transform)
         {
-            Debug.Log(++count);
             if(child.gameObject.GetComponentInChildren<TextMeshProUGUI>().text == part.displayName)
             {
                 Destroy(child.gameObject);
@@ -127,17 +166,16 @@ public class OptionsHandler : MonoBehaviour
         }
     }
 
-    public GameObject addOptionMenu;
-    public TMP_InputField optionNameInput;
-    public TextMeshProUGUI dropLayersHereText;
-    public GameObject layerContainer;
-    public GameObject layerTemplate;
-    public Toggle onByDefaultToggle;
-    public TextMeshProUGUI addOptionsHeader;
-    public Button addButton;
-    public Button deleteButton;
-    public Button saveButton;
+    #endregion option loading
 
+
+
+    #region add / edit options
+
+    #region open option menu
+
+    //open options menu in "add" configuration
+    //-> "empty" settings
     public void PrepareOptionsMenuForAdd()
     {
         optionNameInput.text = "";
@@ -148,8 +186,12 @@ public class OptionsHandler : MonoBehaviour
         addButton.gameObject.SetActive(true);
         deleteButton.gameObject.SetActive(false);
         saveButton.gameObject.SetActive(false);
+
+        addOptionMenu.SetActive(true);
     }
 
+    //open options menu in "edit" configuration
+    //-> settings loaded based on the edited option
     public void PrepareOptionsMenuForEdit(Altimate.Part part)
     {
         optionNameInput.text = part.displayName;
@@ -179,13 +221,56 @@ public class OptionsHandler : MonoBehaviour
         {
             OnSaveToggleClicked(part);
         });
+
+        addOptionMenu.SetActive(true);
     }
 
-    public void OnLayerDeleteClicked(GameObject layerObject, Altimate.Part.ImageData image)
+    //empties layer container of option menu
+    public void ClearLayerContainer()
     {
-        Destroy(layerObject);
+        foreach (Transform child in layerContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
+    public void OnAddOptionClicked()
+    {
+        PrepareOptionsMenuForAdd();
+        
+    }
+
+    public void OnEditOptionClicked(Altimate.Part part)
+    {
+        PrepareOptionsMenuForEdit(part);
+        
+    }
+
+    public void OnAddOptionMenuCloseClicked()
+    {
+        addOptionMenu.SetActive(false);
+    }
+
+    #endregion open option menu
+
+
+
+    #region option layer management
+
+    //called when a layer is dragged and dropped anywhere
+    public void HandleLayerDrop(Altimate.Part.ImageData imageData, PointerEventData eventData)
+    {
+        //flag to identify the layer container as such ("Flag" script is on layer container object)
+        Flag flag = eventData.pointerEnter?.GetComponentInChildren<Flag>();
+
+        if (flag != null && flag.flag == "layer target")
+        {
+            dropLayersHereText.gameObject.SetActive(false);
+            LoadLayerObject(imageData);
+        }
+    }
+
+    //load a layer object (based on the simplified template for the option menu)
     public void LoadLayerObject(Altimate.Part.ImageData image)
     {
         GameObject layer = Instantiate(layerTemplate, layerContainer.transform);
@@ -196,54 +281,32 @@ public class OptionsHandler : MonoBehaviour
             OnLayerDeleteClicked(layer, image);
         });
 
-        //TODO: delete layer button assignment
-
         layer.SetActive(true);
     }
 
-    public void OnAddOptionClicked()
+    public void OnLayerDeleteClicked(GameObject layerObject, Altimate.Part.ImageData image)
     {
-        PrepareOptionsMenuForAdd();
-        addOptionMenu.SetActive(true);
+        Destroy(layerObject);
     }
 
-    public void OnEditOptionClicked(Altimate.Part part)
-    {
-        PrepareOptionsMenuForEdit(part);
-        addOptionMenu.SetActive(true);
-    }
+    #endregion option layer management
 
-    public void OnAddOptionMenuCloseClicked()
-    {
-        addOptionMenu.SetActive(false);
-    }
 
-    public void ClearLayerContainer()
-    {
-        foreach(Transform child in layerContainer.transform)
-        {
-            Destroy(child.gameObject);
-        }
-    }
 
-    public void HandleLayerDrop(Altimate.Part.ImageData imageData, PointerEventData eventData)
-    {
-        Flag flag = eventData.pointerEnter?.GetComponentInChildren<Flag>();
-
-        if(flag != null && flag.flag == "layer target")
-        {
-            dropLayersHereText.gameObject.SetActive(false);
-            LoadLayerObject(imageData);
-        }
-    }
-
+    #region saving toggle options from menu inputs
     public void OnAddToggleClicked()
     {
+        //create empty option object
         Altimate.Part part = new Altimate.Part();
+
+        //toggle options are always optional
         part.optional = true;
+
+        //get values from menu inputs
         part.displayName = optionNameInput.text;
         part.onByDefault = onByDefaultToggle.isOn;
 
+        //go through layer container and move all relevant images to the new option
         foreach(Transform child in layerContainer.transform)
         {
             string imageSource = child.GetComponentInChildren<TextMeshProUGUI>().text;
@@ -261,8 +324,11 @@ public class OptionsHandler : MonoBehaviour
             }
 
         }
-        
+
+        //add new option to altimate object
         AltimateHelper.altimate.parts.Add(part);
+
+        //load option representation in ui
         LoadToggleOption(part);
 
         addOptionMenu.SetActive(false);
@@ -270,12 +336,16 @@ public class OptionsHandler : MonoBehaviour
 
     public void OnSaveToggleClicked(Altimate.Part part)
     {
-        //remove old option
+        //remove old option from ui (to update later)
         RemoveOption(part);
 
+        //get values from menu inputs
         part.displayName = optionNameInput.text;
         part.onByDefault = onByDefaultToggle.isOn;
 
+        //"empty" images of this option by moving them to the basePart
+        //-> when they are added again later they will be based on the up to date layer list
+        //(additions *and* removals will be saved)
         foreach(Altimate.Part.ImageData image in part.images)
         {
             if (!AltimateHelper.altimate.parts[0].images.Contains(image))
@@ -285,6 +355,7 @@ public class OptionsHandler : MonoBehaviour
         }
         part.images.Clear();
 
+        //add all relevant images from the layer container to the option
         foreach (Transform child in layerContainer.transform)
         {
             string imageSource = child.GetComponentInChildren<TextMeshProUGUI>().text;
@@ -303,6 +374,7 @@ public class OptionsHandler : MonoBehaviour
 
         }
 
+        //load updated option in ui
         LoadToggleOption(part);
 
         addOptionMenu.SetActive(false);
@@ -310,6 +382,8 @@ public class OptionsHandler : MonoBehaviour
 
     public void OnDeleteToggleClicked(Altimate.Part part)
     {
+        //move all images to base part
+        //(if they're no longer part of an option, they become part of the default image)
         foreach(Altimate.Part.ImageData image in part.images)
         {
             if (!AltimateHelper.altimate.parts[0].images.Contains(image))
@@ -318,9 +392,14 @@ public class OptionsHandler : MonoBehaviour
             }
         }
 
+        //remove option from altimate and ui
         AltimateHelper.altimate.parts.Remove(part);
         RemoveOption(part);
 
         addOptionMenu.SetActive(false);
     }
+
+    #endregion saving toggle options from menu inputs
+
+    #endregion add / edit options
 }

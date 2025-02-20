@@ -1,12 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using AnotherFileBrowser.Windows;
 using System.IO;
 
+
+
+/*******************************/
+/* wrapper for file operations */
+/*******************************/
+
 public static class FileHelper
 {
+    #region methods
 
+    //select a folder / path
     public static string PickFolderPath(string title)
     {
         var bp = new BrowserProperties();
@@ -24,6 +29,7 @@ public static class FileHelper
         return result;
     }
 
+    //select a single file
     public static string PickFilePath(string title)
     {
         var bp = new BrowserProperties();
@@ -41,6 +47,7 @@ public static class FileHelper
         return result;
     }
 
+    //select one or more files
     public static string[] PickMultipleFilesPath(string title)
     {
         var bp = new BrowserProperties();
@@ -59,15 +66,19 @@ public static class FileHelper
         return result;
     }
 
+    //writes file to path
     public static void SaveToPath(string path, string content)
     {
         //TODO: what if file exists?
         File.WriteAllText(path, content);
     }
 
+    //reads file from path
     public static string ReadFromPath(string path)
     {
         //TODO: what if file doesn't exist?
         return File.ReadAllText(path);
     }
+
+    #endregion methods
 }

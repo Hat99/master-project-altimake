@@ -1,28 +1,35 @@
-using Newtonsoft.Json;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 
 
-/*************************************/
-/*helper for handling altimate object*/
-/*************************************/
+
+/***************************************/
+/* helper for handling altimate object */
+/***************************************/
+
+//globally accessible as static class, but not assignable to gameobjects
 public static class AltimateHelper
 {
+    #region fields
+
     //global altimate object
     public static Altimate altimate;
 
+    //list of all used images (for easier access)
     public static List<Altimate.Part.ImageData> images = new List<Altimate.Part.ImageData>();
 
+    //the highest currently used layer
     public static float maxLayer = 0f;
 
     //base path where the altimate files are to be stored
     public static string basePath;
 
+    #endregion fields
+
+
+
+    #region methods
 
     public static void Clear()
     {
@@ -45,7 +52,6 @@ public static class AltimateHelper
 
         SaveAltimate();
     }
-    
 
     //loads altimate object from basePath and stores in global altimate object
     //if no altimate file is found in designated path, stores empty altimate object instead
@@ -94,21 +100,21 @@ public static class AltimateHelper
                     }
                 }
             }
-            //alternating option (drop down)
+            //TODO: alternating option (drop down)
             else
             {
-                //TODO
+                //...
             }
         }
 
         images.Sort();
         images.Reverse();
 
+        //load all layers
         foreach(Altimate.Part.ImageData image in images)
         {
             layerHandler.LoadLayer(image);
         }
-
 
         //initialize image loading (loads each image one by one to minimize main thread blocking)
         TimedThread.instance.InitializeImageLoading();
@@ -117,7 +123,6 @@ public static class AltimateHelper
     //Saves the global altimate object as a json file in basePath
     public static void SaveAltimate()
     {
-        //TODO: include images list? (seems to work without it, need to test)
         string json = JsonUtility.ToJson(altimate, true);
         FileHelper.SaveToPath(basePath + Path.DirectorySeparatorChar + altimate.name + ".json", json);
     }
@@ -190,7 +195,7 @@ public static class AltimateHelper
                 OptionsHandler.instance.RemoveOption(part);
             }
         }
-
-        
     }
+
+    #endregion methods
 }

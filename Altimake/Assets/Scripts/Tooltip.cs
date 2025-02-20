@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 
 
-//under construction!!!
+//not used, under construction!
 public class Tooltip : MonoBehaviour
 {
     public string tooltipMessage;

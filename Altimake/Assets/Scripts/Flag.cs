@@ -1,6 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+
+
+/********************************************************/
+/* simple flag string that can be added to game objects */
+/********************************************************/
 
 public class Flag : MonoBehaviour
 {
