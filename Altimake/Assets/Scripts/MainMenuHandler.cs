@@ -27,9 +27,29 @@ public class MainMenuHandler : MonoBehaviour
     private void Start()
     {
         instance = this;
+        Application.wantsToQuit += WantsToQuit;
     }
 
     #endregion fields
+
+
+
+    #region application exit
+
+    public bool WantsToQuit()
+    {
+        //if an altimate object exists, save it
+        if(AltimateHelper.altimate != null)
+        {
+            AltimateHelper.SaveAltimate();
+        }
+
+        //"allow" application to close
+        return true;
+    }
+
+    #endregion application exit
+
 
 
 
