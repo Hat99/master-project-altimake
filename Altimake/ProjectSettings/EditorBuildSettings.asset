@@ -8,10 +8,10 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Altimate.unity
     guid: bce616dc921ef874f8494177f7189449
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Altimake.unity
     guid: 89abde89303ce904fa46bdd1e8b9e4c6
   m_configObjects: {}

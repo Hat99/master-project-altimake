@@ -99,7 +99,7 @@ public class OptionsHandler : MonoBehaviour
 
         //set option starting values
         optionObject.GetComponentInChildren<TextMeshProUGUI>().text = part.displayName;
-        Toggle toggle = optionObject.GetComponent<Toggle>();
+        Toggle toggle = optionObject.GetComponentInChildren<Toggle>();
         toggle.isOn = part.onByDefault;
 
         //assign listeners to new object
