@@ -636,6 +636,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 85915486}
+  - component: {fileID: 85915490}
   - component: {fileID: 85915489}
   - component: {fileID: 85915488}
   - component: {fileID: 85915487}
@@ -749,6 +750,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 85915485}
   m_CullTransparentMesh: 1
+--- !u!114 &85915490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 85915485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a196763a01d3ac46b8237a9a43902a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flag: add
 --- !u!1 &96042668
 GameObject:
   m_ObjectHideFlags: 0
@@ -4055,6 +4069,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 554075377}
+  - component: {fileID: 554075381}
   - component: {fileID: 554075380}
   - component: {fileID: 554075379}
   - component: {fileID: 554075378}
@@ -4168,6 +4183,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 554075376}
   m_CullTransparentMesh: 1
+--- !u!114 &554075381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554075376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a196763a01d3ac46b8237a9a43902a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flag: delete
 --- !u!1 &587481077
 GameObject:
   m_ObjectHideFlags: 0
@@ -5408,10 +5436,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 1928322001}
+  canvasGroup: {fileID: 0}
   onDragEnd:
     m_PersistentCalls:
       m_Calls: []
-  canvasGroup: {fileID: 0}
   dragDuplicate: 0
 --- !u!114 &746060777
 MonoBehaviour:
@@ -9506,7 +9534,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.19800001, y: 0}
   m_AnchorMax: {x: 0.8006291, y: 1}
-  m_AnchoredPosition: {x: 0.000030517578, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1297010965
@@ -10185,7 +10213,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fileMenu: {fileID: 1754073640}
-  fileMenuCollider: {fileID: 0}
   mouseOver: 0
 --- !u!1 &1430236454
 GameObject:
@@ -13214,7 +13241,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -395.39825}
+  m_SizeDelta: {x: 0, y: -429.32468}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1773560267
 MonoBehaviour:
@@ -13339,7 +13366,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 17.8
+  m_fontSize: 18.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -14857,10 +14884,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 1928322001}
+  canvasGroup: {fileID: 0}
   onDragEnd:
     m_PersistentCalls:
       m_Calls: []
-  canvasGroup: {fileID: 0}
   dragDuplicate: 1
 --- !u!225 &2017407659
 CanvasGroup:
